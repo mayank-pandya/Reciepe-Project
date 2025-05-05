@@ -1,8 +1,9 @@
 <?php
 require_once "./controls/functions.php";
+session_start();
 
 $login_message = "";
-$login_status = ""; // success or error
+$login_status = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST['email']);
@@ -11,7 +12,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user = fetchRow("SELECT * FROM users WHERE email = ?", [$email], "s");
 
     if ($user && password_verify($password, $user['password'])) {
-        session_start();
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['first_name'] = $user['first_name'];
 
@@ -21,6 +21,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $login_message = "❌ Invalid Email or Password!";
         $login_status = "error";
     }
+}
+
+// Redirect logged-in user away from login page
+if (isset($_SESSION['user_id'])) {
+    header("Location: dashboard.php");
+    exit();
 }
 ?>
 
@@ -32,19 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="login.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- Include SweetAlert2 -->
-
-
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const user = JSON.parse(localStorage.getItem("user"));
-            if (user && user.id) {
-                // User is already logged in, redirect
-                window.location.href = "dashboard.php";
-            }
-        });
-    </script>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -74,14 +68,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <?php if (!empty($login_message)): ?>
         <script>
-            <?php if ($login_status === "success"): ?>
-                // Store necessary user data in localStorage
-                localStorage.setItem("user", JSON.stringify({
-                    id: "<?php echo $_SESSION['user_id']; ?>",
-                    first_name: "<?php echo $_SESSION['first_name']; ?>"
-                }));
-            <?php endif; ?>
-
             Swal.fire({
                 icon: "<?php echo $login_status; ?>",
                 title: "<?php echo $login_message; ?>",
@@ -93,9 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <?php } ?>
             });
         </script>
-
     <?php endif; ?>
-
 </body>
 
 </html>

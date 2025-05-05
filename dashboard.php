@@ -1,3 +1,8 @@
+<?php
+session_start();
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,30 +20,6 @@
   <title>Kitchen Notes Dashboard</title>
 
 
-
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const user = JSON.parse(localStorage.getItem("user"));
-      const loginLink = document.getElementById("loginLink");
-      const logoutLink = document.getElementById("logoutLink");
-
-      if (user && user.id) {
-        // Hide login, show logout
-        loginLink.style.display = "none";
-        logoutLink.style.display = "inline";
-
-        logoutLink.addEventListener("click", (e) => {
-          e.preventDefault();
-          localStorage.removeItem("user");
-          // Optional: you can call logout.php here to destroy session if needed
-          window.location.href = "login.php";
-        });
-      }
-    });
-  </script>
-
-
-
 </head>
 
 <body>
@@ -51,8 +32,11 @@
         <a href="index.html">Home</a>
         <a href="recipepage.php">Recipes</a>
 
-        <a href="login.php" id="loginLink">Login</a>
-        <a href="#" id="logoutLink" style="display: none;">Logout</a>
+        <?php if (isset($_SESSION['user_id'])): ?>
+          <a href="logout.php">Logout</a>
+        <?php else: ?>
+          <a href="login.php">Login</a>
+        <?php endif; ?>
 
         <a href="add-reciepe.php">Add Recipe</a>
         <a href="about.html">About Us</a>
@@ -108,7 +92,7 @@
       </div>
     </div>
 
-    <a href="recipepage.html"><button>View More</button></a>
+    <a href="recipepage.php"><button>View More</button></a>
 
   </section>
 
