@@ -1,2 +1,2 @@
 # Reciepe-Project
-Final Year Project using PHP and MySQL
+Final year project in PHP and MySQL
